@@ -1,8 +1,6 @@
 import sqlite3
-
 db = sqlite3.connect("users.db")
 c = db.cursor()
-
 c.execute("""
 CREATE TABLE IF NOT EXISTS users (
     name TEXT,
@@ -12,13 +10,10 @@ CREATE TABLE IF NOT EXISTS users (
 )
 """)
 db.commit()
-
-
 def register():
     name = input("Name: ").strip()
     email = input("Email: ").strip().lower()
     password = input("Password: ")
-
     try:
         c.execute(
             "INSERT INTO users VALUES (?, ?, ?, ?)",
@@ -28,8 +23,6 @@ def register():
         print("Registered successfully!")
     except sqlite3.IntegrityError:
         print("Email already exists!")
-
-
 def login():
     email = input("Email: ").strip().lower()
     password = input("Password: ")
@@ -39,22 +32,17 @@ def login():
         (email, password)
     )
     user = c.fetchone()
-
     if user:
         print("Welcome", user[0])
         print("Role:", user[3])
     else:
         print("Wrong email or password!")
-
-
 while True:
     print("\n=== USER MANAGEMENT ===")
     print("1. Register")
     print("2. Login")
     print("3. Exit")
-
     choice = input("Choose: ")
-
     if choice == "1":
         register()
     elif choice == "2":
@@ -63,5 +51,4 @@ while True:
         break
     else:
         print("Invalid choice!")
-
 db.close()
