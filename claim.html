@@ -1,0 +1,148 @@
+<body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .card-container {
+        background: #ffffff;
+        width: 100%;
+        max-width: 450px;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .card-header .icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .card-header h2 {
+        color: #2c3e50;
+        font-size: 22px;
+    }
+
+    .card-header p {
+        color: #7f8c8d;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #34495e;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 90px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+    }
+
+    .submit-btn:hover {
+        background-color: #2980b9;
+    }
+
+    .submit-btn:active {
+        transform: scale(0.98);
+    }
+
+    #statusMessage {
+        margin-top: 20px;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        text-align: center;
+        display: none;
+        font-weight: 600;
+    }>
+</style>
+<div class="card-container">
+    <div class="card-header">
+        <div class="icon">📝</div>
+        <h2>تقديم طلب ملكية</h2>
+        <p>أدخل بيانات الغرض والمواصفات الخاصة لإثبات ملكيتك</p>
+    </div>
+
+    <form id="claimForm" onsubmit="handleClaim(event)">
+        <div class="form-group">
+            <label for="itemId">اسم الغرض أو رمزه</label>
+            <input type="text" id="itemId" required placeholder="مثال: محفظة سوداء / ساعة يد">
+        </div>
+
+        <div class="form-group">
+            <label for="claimProof">إثبات الملكية (علامة فارقة)</label>
+            <textarea id="claimProof" required placeholder="اذكر التفاصيل والمواصفات التي لا يعرفها إلا صاحب الغرض..."></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">إرسال الطلب والتحقق</button>
+    </form>
+
+    <div id="statusMessage"></div>
+</div>
+
+<script>
+    function handleClaim(e) {
+        e.preventDefault();
+        const proof = document.getElementById('claimProof').value;
+        const status = document.getElementById('statusMessage');
+        
+        status.style.display = 'block';
+
+        if (proof.length < 5) {
+            status.style.backgroundColor = '#f8d7da';
+            status.style.color = '#721c24';
+            status.innerText = '❌ الطلب مرفوض: يرجى تقديم وصف أكثر دقة لإثبات الملكية.';
+        } else {
+            status.style.backgroundColor = '#d4edda';
+            status.style.color = '#155724';
+            status.innerText = '✅ تم تقديم طلب الملكية بنجاح! وهو قيد التحقق حالياً.';
+            document.getElementById('claimForm').reset();
+        }
+    }
+</script>
