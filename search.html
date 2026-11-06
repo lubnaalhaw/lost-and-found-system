@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Lost and Found Items</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f6fc;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: #245b91;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #245b91;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #17436e;
+        }
+
+        .item {
+            background: #eef4fb;
+            padding: 15px;
+            margin-top: 12px;
+            border-radius: 6px;
+        }
+
+        .item h3 {
+            color: #245b91;
+        }
+
+        #message {
+            text-align: center;
+            color: #b00020;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Search Lost and Found Items</h1>
+
+    <input
+        type="text"
+        id="searchName"
+        placeholder="Search by item name..."
+    >
+
+    <select id="category">
+        <option value="">All Categories</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Clothing">Clothing</option>
+        <option value="Accessories">Accessories</option>
+        <option value="Books">Books</option>
+    </select>
+
+    <input type="date" id="searchDate">
+
+    <button onclick="searchItems()">Search</button>
+    <button onclick="clearFilters()">Clear Filters</button>
+
+    <p id="message">Loading items...</p>
+
+    <div id="results"></div>
+
+</div>
+
+<script>
+
+    let items = [];
+
+    // Load items from the shared SQLite database
+    async function loadItems() {
+
+        const message = document.getElementById("message");
+
+        try {
+
+            const response = await fetch(
+                "http://127.0.0.1:8000/api/items"
+            );
+
+            if (!response.ok) {
+                throw new Error("Server returned status: " + response.status);
+            }
+
+            items = await response.json();
+
+            if (!Array.isArray(items)) {
+                throw new Error("Invalid data received from server");
+            }
+
+            displayResults(items);
+
+        } catch (error) {
+
+            message.textContent =
+                "Error loading items: " + error.message;
+
+            console.error("Loading error:", error);
+        }
+    }
+
+
+    // Search and filter items
+    function searchItems() {
+
+        const name = document.getElementById("searchName")
+            .value.trim().toLowerCase();
+
+        const selectedCategory =
+            document.getElementById("category").value;
+
+        const selectedDate =
+            document.getElementById("searchDate").value;
+
+        const filteredItems = items.filter(item => {
+
+            return (
+                item.item_name.toLowerCase().includes(name) &&
+
+                (selectedCategory === "" ||
+                 item.category === selectedCategory) &&
+
+                (selectedDate === "" ||
+                 item.item_date === selectedDate)
+            );
+
+        });
+
+        displayResults(filteredItems);
+    }
+
+
+    // Display items on the page
+    function displayResults(results) {
+
+        const resultsDiv = document.getElementById("results");
+        const message = document.getElementById("message");
+
+        resultsDiv.innerHTML = "";
+        message.textContent = "";
+
+        if (results.length === 0) {
+
+            message.textContent = "No matching items found.";
+
+            return;
+        }
+
+        results.forEach(item => {
+
+            const card = document.createElement("div");
+            card.className = "item";
+
+            const title = document.createElement("h3");
+            title.textContent = item.item_name;
+
+            const category = document.createElement("p");
+            category.textContent =
+                "Category: " + item.category;
+
+            const date = document.createElement("p");
+            date.textContent =
+                "Date: " + item.item_date;
+
+            const status = document.createElement("p");
+            status.className = "status";
+            status.textContent =
+                "Status: " + item.status;
+
+            const location = document.createElement("p");
+            location.textContent =
+                "Location: " + (item.location || "Not specified");
+
+            const description = document.createElement("p");
+            description.textContent =
+                "Description: " +
+                (item.description || "No description");
+
+            card.append(
+                title,
+                category,
+                date,
+                status,
+                location,
+                description
+            );
+
+            resultsDiv.appendChild(card);
+
+        });
+    }
+
+
+    // Clear all filters
+    function clearFilters() {
+
+        document.getElementById("searchName").value = "";
+        document.getElementById("category").value = "";
+        document.getElementById("searchDate").value = "";
+
+        displayResults(items);
+    }
+
+
+    // Load items when the page opens
+    loadItems();
+
+</script>
+
+</body>
+</html>
